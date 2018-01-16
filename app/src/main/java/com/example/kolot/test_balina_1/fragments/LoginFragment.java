@@ -38,24 +38,28 @@ public class LoginFragment extends android.support.v4.app.Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.login_fragment, null);
+        View view = inflater.inflate(R.layout.login_fragment, container, false);
 
         login = (EditText) view.findViewById(R.id.login_login);
         pass = (EditText) view.findViewById(R.id.login_password);
         button = (Button) view.findViewById(R.id.login_button);
+
         return view;
     }
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
+        login.setText("maxnedomax");
+        pass.setText("popopopo");
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+
+
                 password = pass.getText().toString();
                 log = login.getText().toString();
-
 
                 if (!password.isEmpty() && !log.isEmpty()) {
 
