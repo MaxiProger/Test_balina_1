@@ -1,5 +1,6 @@
 package com.example.kolot.test_balina_1.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.kolot.test_balina_1.R;
+import com.example.kolot.test_balina_1.activities.DetailInformation;
+import com.example.kolot.test_balina_1.activities.Main2Activity;
 import com.example.kolot.test_balina_1.adapters.RecyclerViewAdapter;
 
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ public class PhotosFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
     private ArrayList<String> dates = new ArrayList<>();
+    private Main2Activity activity;
 
     @Nullable
     @Override
@@ -40,6 +44,14 @@ public class PhotosFragment extends Fragment {
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
+        adapter.setItemClickListener(new RecyclerViewAdapter.ItemClickListener() {
+            @Override
+            public void onClick(String date) {
+                Intent intent = new Intent(getContext(), DetailInformation.class);
+                intent.putExtra("date", date);
+                startActivity(intent);
+            }
+        });
     }
 
     public ArrayList<String> init() {

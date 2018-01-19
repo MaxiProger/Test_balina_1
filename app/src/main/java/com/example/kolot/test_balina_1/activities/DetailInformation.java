@@ -1,24 +1,48 @@
-package com.example.kolot.test_balina_1;
+package com.example.kolot.test_balina_1.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.kolot.test_balina_1.R;
+import com.example.kolot.test_balina_1.adapters.DetailInfoRVAdapter;
+
+import java.util.ArrayList;
 
 public class DetailInformation extends AppCompatActivity {
 
+    private RecyclerView recyclerView;
+    private ImageView imageView;
     private TextView textView;
+    private DetailInfoRVAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_information);
+        ArrayList<String> info = new ArrayList<>();
+        adapter = new DetailInfoRVAdapter(init(info));
+        recyclerView = (RecyclerView) findViewById(R.id.detailRecyclerView);
+        imageView = (ImageView) findViewById(R.id.detailImageView);
+        textView = (TextView) findViewById(R.id.detailDateTV);
+        imageView.setImageResource(R.drawable.ic_launcher);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapter);
 
-        textView = (TextView) findViewById(R.id.detailTextView);
-
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         String date = intent.getStringExtra("date");
         textView.setText(date);
+    }
 
+    public ArrayList<String> init(ArrayList<String> info){
+        for (int i = 0 ; i < 6 ; i ++)
+            info.add(String.valueOf(i));
+        return info;
     }
 }
