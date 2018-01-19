@@ -99,7 +99,7 @@ public class Main2Activity extends AppCompatActivity
                         startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                         galleryAddPic();
                         encoded = toBase64(photoFile);
-                        Log.e("64", encoded);
+                        Log.e("base64", encoded);
                     }
                 }
 
