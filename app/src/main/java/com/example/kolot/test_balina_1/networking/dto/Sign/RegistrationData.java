@@ -1,19 +1,13 @@
-package com.example.kolot.test_balina_1.networking.dto;
+package com.example.kolot.test_balina_1.networking.dto.Sign;
 
 /**
  * Created by kolot on 15.01.2018.
  */
 
-public class data {
+public class RegistrationData {
     private int userId;
     private String login;
     private String token;
-
-    public data(int userId, String login, String token) {
-        this.userId = userId;
-        this.login = login;
-        this.token = token;
-    }
 
     public int getUserId() {
 

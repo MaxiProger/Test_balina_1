@@ -1,24 +1,15 @@
-package com.example.kolot.test_balina_1.dto;
+package com.example.kolot.test_balina_1.networking.dto.Images;
 
 /**
- * Created by kolot on 17.01.2018.
+ * Created by kolot on 20.01.2018.
  */
 
-public class commentsDto {
-
-    private int date;
+public class postImageDto {
     private int id;
+    private String url;
+    private int date;
     private int lat;
     private int lng;
-    private String url;
-
-    public commentsDto(int date, int id, int lat, int lng, String url) {
-        this.date = date;
-        this.id = id;
-        this.lat = lat;
-        this.lng = lng;
-        this.url = url;
-    }
 
     public int getDate() {
         return date;

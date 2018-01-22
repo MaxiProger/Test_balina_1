@@ -4,13 +4,13 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -26,7 +26,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 
+import com.example.kolot.test_balina_1.BuildConfig;
 import com.example.kolot.test_balina_1.R;
 import com.example.kolot.test_balina_1.adapters.RecyclerViewAdapter;
 import com.example.kolot.test_balina_1.fragments.MapFragment;
@@ -35,7 +38,9 @@ import com.example.kolot.test_balina_1.fragments.PhotosFragment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,15 +48,23 @@ import java.util.Date;
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+
 
     private PhotosFragment photosFragment;
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
     private ArrayList<String> dates = new ArrayList<>();
-    private String mCurrentPhotoPath;
     private Bitmap bitmap;
     private String encoded;
+    static final int REQUEST_TAKE_PHOTO = 1;
+    static final int REQUEST_IMAGE_CAPTURE  = 1;
+    private Button button;
+    private ImageView mImageView;
+    private String mCurrentPhotoPath;
+    private static String path;
+    public static String token ="";
+    private int id = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +72,31 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            token = bundle.getString("token");
+            id = bundle.getInt("photo_Id");
+            Log.e("bundletoken", token);
+            Log.e("bundleid", String.valueOf(id));
+        }
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               dispatchTakePictureIntent();
+
+            }
+        });
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -74,75 +112,118 @@ public class Main2Activity extends AppCompatActivity
             }
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                // Ensure that there's a camera activity to handle the intent
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    // Create the File where the photo should go
-                    File photoFile = null;
-                    try {
-                        photoFile = createImageFile();
-                    } catch (IOException ex) {
-                        // Error occurred while creating the File
-                        Snackbar.make(view, "Error: " + ex.getMessage(), Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-                    // Continue only if the File was successfully created
-                    if (photoFile != null) {
-                        Uri photoURI = FileProvider.getUriForFile(Main2Activity.this,
-                                "com.example.android.fileprovider",
-                                photoFile);
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                        galleryAddPic();
-                        encoded = toBase64(photoFile);
-                        Log.e("base64", encoded);
-                    }
-                }
-
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.container, new PhotosFragment()).commit();
+        fragmentTransaction.replace(R.id.container, new PhotosFragment()).addToBackStack(null).commit();
+
+
+
     }
 
-    public String toBase64(File photoFile) {
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+
+            }
+            if (photoFile != null) {
+                path = photoFile.getAbsolutePath();
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        BuildConfig.APPLICATION_ID,
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            String encoded = fileToBase64(bitmapToFile(path));
+            galleryAddPic();
+
+            Intent intent = new Intent(Main2Activity.this, PreviewActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("base64", encoded);
+            bundle.putString("pathBitmap", bitmapToFile(path));
+            bundle.putString("token", token);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+    }
+
+    public String bitmapToFile(String path){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+        File bitmapFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "savedbitmap1.jpg");
+        String pathBitmap = bitmapFile.getAbsolutePath();
+        Log.e("base64", pathBitmap);
+        try {
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(bitmapFile);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+            } finally {
+                if (fos != null) fos.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return pathBitmap;
+    }
+
+    public String fileToBase64(String pathBitmap){
+        File f = new File(pathBitmap);		//change path of image according to you
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(photoFile);
+            fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        byte byteArray[] = new byte[(int)photoFile.length()];
+        byte byteArray[] = new byte[(int)f.length()];
         try {
-            fis.read(byteArray);
+            if (fis != null) {
+                fis.read(byteArray);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+        byte[] imageString = Base64.encode(byteArray, Base64.NO_WRAP);
+        String s = null;
+        try {
+            s = new String(imageString, "ASCII");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        try {
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.e("base64", s);
+        return s;
     }
 
 
-
-    public void galleryAddPic() {
+    private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(mCurrentPhotoPath);
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    public Bitmap decoder(String base64Str){
+        byte[] decodedBytes = Base64.decode(
+                base64Str.substring(base64Str.indexOf(",")  + 1),
+                Base64.DEFAULT
+        );
+
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
 
     private File createImageFile() throws IOException {

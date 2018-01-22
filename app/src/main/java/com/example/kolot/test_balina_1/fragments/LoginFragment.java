@@ -3,6 +3,7 @@ package com.example.kolot.test_balina_1.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +14,9 @@ import android.widget.Toast;
 
 import com.example.kolot.test_balina_1.R;
 import com.example.kolot.test_balina_1.activities.Main2Activity;
-import com.example.kolot.test_balina_1.networking.api.Api_Registration;
-import com.example.kolot.test_balina_1.networking.dto.UserDTO;
-import com.example.kolot.test_balina_1.networking.dto.registrationDTO;
+import com.example.kolot.test_balina_1.networking.api.Api;
+import com.example.kolot.test_balina_1.networking.dto.Sign.UserDTO;
+import com.example.kolot.test_balina_1.networking.dto.Sign.registrationDTO;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,7 +34,8 @@ public class LoginFragment extends android.support.v4.app.Fragment {
 
     private EditText login, pass;
     private Button button;
-    private String password, log;
+    private String password, log, token = "";
+    private int id = 0;
 
     @Nullable
     @Override
@@ -54,8 +56,7 @@ public class LoginFragment extends android.support.v4.app.Fragment {
         pass.setText("popopopo");
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
+            public void onClick(final View view) {
 
 
                 password = pass.getText().toString();
@@ -67,28 +68,32 @@ public class LoginFragment extends android.support.v4.app.Fragment {
                             .addConverterFactory(GsonConverterFactory.create());
                     Retrofit retrofit = builder.build();
 
-                    Api_Registration api_registration = retrofit.create(Api_Registration.class);
+                    Api api_registration = retrofit.create(Api.class);
 
-                    api_registration.signin(new UserDTO(log,password)).enqueue(new Callback<registrationDTO>() {
+                    api_registration.signin(new UserDTO(log, password)).enqueue(new Callback<registrationDTO>() {
                         @Override
                         public void onResponse(Call<registrationDTO> call, Response<registrationDTO> response) {
 
-                            if(response.body()!=null){
-                                Log.d("ResponseLogin",response.body().getData().getLogin());
-                                Log.d("ResponseLogin",response.body().getData().getToken());
-                                Log.d("ResponseLogin", String.valueOf(response.body().getData().getUserId()));
-                                Intent intent = new Intent(getContext(), Main2Activity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                                intent.putExtra("id", String.valueOf(response.body().getData().getUserId()));
-                                intent.putExtra("token", response.body().getData().getToken());
-                                intent.putExtra("login", response.body().getData().getLogin());
+                            if (response.isSuccessful()) {
+                                token = response.body().getData().getToken();
+                                id = response.body().getData().getUserId();
+                            }
+                            Log.d("ResponseLogin", response.body().getData().getLogin());
+                            Log.d("ResponseLogin", response.body().getData().getToken());
+                            Log.d("ResponseLogin", String.valueOf(response.body().getData().getUserId()));
+                            Intent intent = new Intent(getContext(), Main2Activity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("token", token);
+                            bundle.putInt("photo_Id", id);
+                            intent.putExtras(bundle);
                             startActivity(intent);
-                            }else Toast.makeText(getContext(), "Try again", Toast.LENGTH_LONG).show();
 
 
                         }
 
                         @Override
                         public void onFailure(Call<registrationDTO> call, Throwable t) {
+                            Snackbar.make(view, t.getMessage(), Snackbar.LENGTH_LONG).show();
                             Log.d("ResponseLogin", t.getMessage());
                         }
                     });

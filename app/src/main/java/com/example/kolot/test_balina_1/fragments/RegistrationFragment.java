@@ -2,6 +2,7 @@ package com.example.kolot.test_balina_1.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +12,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.kolot.test_balina_1.R;
-import com.example.kolot.test_balina_1.networking.api.Api_Registration;
-import com.example.kolot.test_balina_1.networking.dto.UserDTO;
-import com.example.kolot.test_balina_1.networking.dto.registrationDTO;
+import com.example.kolot.test_balina_1.networking.api.Api;
+import com.example.kolot.test_balina_1.networking.dto.Sign.UserDTO;
+import com.example.kolot.test_balina_1.networking.dto.Sign.registrationDTO;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,7 +52,7 @@ public class RegistrationFragment extends android.support.v4.app.Fragment {
         super.onViewCreated(view, savedInstanceState);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
 
                 password = pass.getText().toString();
                 password_rep = pass_rep.getText().toString();
@@ -65,7 +66,7 @@ public class RegistrationFragment extends android.support.v4.app.Fragment {
                                 .addConverterFactory(GsonConverterFactory.create());
                         Retrofit retrofit = builder.build();
 
-                        Api_Registration api_registration = retrofit.create(Api_Registration.class);
+                        Api api_registration = retrofit.create(Api.class);
 
                         api_registration.signup(new UserDTO(log, password)).enqueue(new Callback<registrationDTO>() {
                             @Override
@@ -73,7 +74,7 @@ public class RegistrationFragment extends android.support.v4.app.Fragment {
                                 log = response.body().getData().getLogin();
                                 password = String.valueOf(response.body().getData().getUserId());
                                 if (!log.isEmpty() && !password.isEmpty())
-                                    Toast.makeText(getContext(), "Registration has went well.", Toast.LENGTH_LONG).show();
+                                    Snackbar.make(view, "Registration has went well.", Snackbar.LENGTH_LONG).show();
                                 Log.d("Response",response.body().getData().getLogin());
                                 Log.d("Response",response.body().getData().getToken());
                                 Log.d("Response", String.valueOf(response.body().getData().getUserId()));

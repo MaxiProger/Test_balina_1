@@ -1,4 +1,4 @@
-package com.example.kolot.test_balina_1.networking.dto;
+package com.example.kolot.test_balina_1.networking.dto.Sign;
 
 /**
  * Created by kolot on 15.01.2018.
