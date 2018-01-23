@@ -52,8 +52,6 @@ public class LoginFragment extends android.support.v4.app.Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
-        login.setText("maxnedomax");
-        pass.setText("popopopo");
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
