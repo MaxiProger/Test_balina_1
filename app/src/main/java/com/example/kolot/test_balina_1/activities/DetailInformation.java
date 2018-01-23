@@ -35,7 +35,6 @@ public class DetailInformation extends AppCompatActivity {
         imageView.setImageResource(R.drawable.ic_launcher);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

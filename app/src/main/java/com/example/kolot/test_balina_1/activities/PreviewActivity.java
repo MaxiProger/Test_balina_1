@@ -4,15 +4,17 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.kolot.test_balina_1.R;
+import com.example.kolot.test_balina_1.adapters.RecyclerViewAdapter;
 import com.example.kolot.test_balina_1.networking.api.Api;
-import com.example.kolot.test_balina_1.networking.dto.Comments.CommentsDto;
-import com.example.kolot.test_balina_1.networking.dto.Images.GetImageDto;
 import com.example.kolot.test_balina_1.networking.dto.Images.imagesDto;
 import com.example.kolot.test_balina_1.networking.dto.Images.postImageStatusDto;
 
@@ -25,7 +27,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PreviewActivity extends AppCompatActivity implements View.OnClickListener {
+public class PreviewActivity extends AppCompatActivity  {
 
     private ImageView previewImageView;
     private Button previewCancel, previewUpload;
@@ -34,8 +36,6 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     private String pathBitmap;
     private Retrofit retrofit;
     private double lat, lon;
-    private int id = 0;
-    private String url = "";
     final String BASE_URL = "http://junior.balinasoft.com/api/";
 
     @Override
@@ -55,13 +55,22 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
 
         }
         previewImageView = (ImageView) findViewById(R.id.preview);
-        previewCancel = (Button) findViewById(R.id.cancel);
-        previewUpload = (Button) findViewById(R.id.upload);
+        /*previewCancel = (Button) findViewById(R.id.cancel);
+        previewUpload = (Button) findViewById(R.id.upload);*/
 
-        previewImageView.setImageBitmap(BitmapFactory.decodeFile(pathBitmap));
+        previewImageView.setImageBitmap(BitmapFactory.decodeFile(pathBitmap));/*
         previewUpload.setOnClickListener(this);
-        previewCancel.setOnClickListener(this);
-
+        previewCancel.setOnClickListener(this);*/
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -70,6 +79,25 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.preview, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_send:
+                uploadImage(encoded, lat,lon);
+                finish();
+                return true;
+                default:return super.onOptionsItemSelected(item);
+        }
+
+
+    }
+
+   /* @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.cancel:
@@ -82,7 +110,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 break;
         }
     }
-
+*/
 
     public void uploadImage(String base64, double lat, double lon) {
 
@@ -92,55 +120,13 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 .enqueue(new Callback<postImageStatusDto>() {
                     @Override
                     public void onResponse(@NonNull Call<postImageStatusDto> call, @NonNull Response<postImageStatusDto> response) {
-                        Log.e("responsePost", response.body().getData().getUrl());
-                        Log.e("responsePost", String.valueOf(response.body().getData().getId()));
-                        Log.e("responsePost", String.valueOf(response.body().getData().getLat()));
-                        Log.e("responsePost", String.valueOf(response.body().getData().getLng()));
+                        RecyclerViewAdapter adapter = new RecyclerViewAdapter(getApplication());
+                        adapter.notifyDataSetChanged();
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<postImageStatusDto> call, @NonNull Throwable t) {
-                        Log.e("responsePost", t.getMessage());
-                    }
-                });
-    }
-
-    public void getImages() {
-        Api api_image = retrofit.create(Api.class);
-        api_image.download(0, token)
-                .enqueue(new Callback<GetImageDto>() {
-                    @Override
-                    public void onResponse(Call<GetImageDto> call, Response<GetImageDto> response) {
-
-                        Log.e("responsePost", response.message());
-                        Log.e("responsePost", String.valueOf(response.body()));
-                        Log.e("responsePost", String.valueOf(response.raw()));
-                    }
-
-                    @Override
-                    public void onFailure(Call<GetImageDto> call, Throwable t) {
-                        Log.e("responsePost", t.getMessage());
-                    }
-                });
-    }
-
-    public void getComments(int imageId) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        Api api_comment = retrofit.create(Api.class);
-
-        api_comment.getComments(imageId, 0, token)
-                .enqueue(new Callback<CommentsDto>() {
-                    @Override
-                    public void onResponse(@NonNull Call<CommentsDto> call, @NonNull Response<CommentsDto> response) {
-                        Log.e("comments: ", String.valueOf(response.raw()));
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<CommentsDto> call, @NonNull Throwable t) {
-                        Log.e("comments: ", t.getMessage());
+                        Log.e("responsePost: " , t.getMessage());
                     }
                 });
     }

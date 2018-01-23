@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,11 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 
 import com.example.kolot.test_balina_1.BuildConfig;
 import com.example.kolot.test_balina_1.GPSTracker;
@@ -47,21 +43,12 @@ import java.util.Date;
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-
-
     static final int REQUEST_TAKE_PHOTO = 1;
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private Button button;
-    private ImageView mImageView;
     private String mCurrentPhotoPath;
     private static String path;
     public static String token = "";
     private int id = 0;
-    private LocationManager locationManager;
-
-
-
-    final String BASE_URL = "http://junior.balinasoft.com/api/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +56,6 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             token = bundle.getString("token");
@@ -112,8 +97,6 @@ public class Main2Activity extends AppCompatActivity
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.container, new PhotosFragment()).addToBackStack(null).commit();
-
-
     }
 
     private void dispatchTakePictureIntent() {
@@ -138,19 +121,19 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
+
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             String encoded = fileToBase64(bitmapToFile(path));
             galleryAddPic();
-
-
             Intent intent = new Intent(Main2Activity.this, PreviewActivity.class);
             Bundle bundle = new Bundle();
             bundle.putString("base64", encoded);
             bundle.putString("pathBitmap", bitmapToFile(path));
             bundle.putString("token", token);
             GPSTracker tracker = new GPSTracker(this);
-            if (tracker.canGetLocation() == false) {
+            if (!tracker.canGetLocation()) {
                 tracker.showSettingsAlert();
             } else {
                 bundle.putDouble("lat", tracker.getLatitude());
@@ -235,8 +218,6 @@ public class Main2Activity extends AppCompatActivity
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
-        // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
@@ -252,30 +233,7 @@ public class Main2Activity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main2, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
 
         int id = item.getItemId();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();

@@ -23,7 +23,6 @@ import java.util.List;
  */
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-    Images check;
 
     public void addDates(ArrayList<postImageDto> data) {
         this.dates.addAll(data);
@@ -74,11 +73,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             cardView = (CardView) itemView.findViewById(R.id.cardPhotoItem);
             imageView = (ImageView) itemView.findViewById(R.id.imageItem);
         }
-    }
-
-    public void setDates(ArrayList<postImageDto> dates) {
-        this.dates = dates;
-        notifyDataSetChanged();
     }
 
     public void refreshDates(int id) {

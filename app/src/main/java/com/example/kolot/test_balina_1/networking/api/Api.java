@@ -22,10 +22,9 @@ import retrofit2.http.Query;
 
 public interface Api {
 
-    @GET("/image/{imageId}/comment")
+    @GET("/image/{imageId}/comment?page=0")
     Call<CommentsDto> getComments (
             @Path("imageId") int imageId,
-            @Query("page") int page,
             @Header("Access-Token") String token);
 
     @POST("image")

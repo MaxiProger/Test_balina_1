@@ -78,9 +78,6 @@ public class LoginFragment extends android.support.v4.app.Fragment {
                                 token = response.body().getData().getToken();
                                 id = response.body().getData().getUserId();
                             }
-                            Log.d("ResponseLogin", response.body().getData().getLogin());
-                            Log.d("ResponseLogin", response.body().getData().getToken());
-                            Log.d("ResponseLogin", String.valueOf(response.body().getData().getUserId()));
                             Intent intent = new Intent(getContext(), Main2Activity.class);
                             Bundle bundle = new Bundle();
                             bundle.putString("token", token);

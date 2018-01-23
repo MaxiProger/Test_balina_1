@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.example.kolot.test_balina_1.activities.PreviewActivity">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <ImageView
         android:id="@+id/preview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_height="match_parent"/>
 
-
-
-        <Button
+        <!--<Button
             android:id="@+id/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:background="@color/cancel"
             android:text="cancel"
             android:textColor="#FDFDFD"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_margin="16dp" />
+            android:layout_margin="24dp"
+            android:layout_alignParentStart="true" />
 
         <Button
             android:id="@+id/upload"
@@ -35,12 +38,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:background="@color/upload"
             android:text="upload"
             android:textColor="#FDFDFD"
             app:layout_constraintBaseline_toBaselineOf="@+id/cancel"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_margin="16dp" />
+            android:layout_margin="24dp"
+            android:layout_alignParentEnd="true" />-->
 
 
-</RelativeLayout>
+</LinearLayout>

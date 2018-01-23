@@ -49,7 +49,6 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
         images = Images.listAll(Images.class);
 
         for (int i = 0 ; i < images.size(); i ++){
-            //File img = new File();
             mMap.addMarker(new MarkerOptions().position(new LatLng(images.get(i).getLat(), images.get(i)
                     .getLon())).icon(BitmapDescriptorFactory.defaultMarker()).title(String.valueOf(images.get(i).getPhotoId())));
         }

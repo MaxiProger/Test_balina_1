@@ -32,7 +32,11 @@ public class Images extends SugarRecord<Images> {
     private int photoId;
     private int lat;
     private int lon;
+    public Comments comment;
 
+    public Comments getComment() {
+        return comment;
+    }
 
     public Images() {
     }
