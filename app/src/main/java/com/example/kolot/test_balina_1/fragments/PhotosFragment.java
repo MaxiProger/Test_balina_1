@@ -47,15 +47,13 @@ public class PhotosFragment extends Fragment {
     private RecyclerViewAdapter adapter;
     private SwipyRefreshLayout refreshLayout;
     private ArrayList<postImageDto> data = new ArrayList<>();
-    private ArrayList<postImageDto> dataRespone;
-    private Main2Activity activity;
     public static int i = 0;
-    private GetImageDto getImageDto = new GetImageDto();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.photos_fragment, container, false);
+
         return view;
     }
 
@@ -92,6 +90,7 @@ public class PhotosFragment extends Fragment {
                 Log.e("clicked", String.valueOf(id));
 
                 CreateAlertDialog(id);
+                i=0;
 
             }
         });
@@ -162,6 +161,7 @@ public class PhotosFragment extends Fragment {
             @Override
             public void onResponse(Call<GetImageDto> call, Response<GetImageDto> response) {
                 Log.e("delete", String.valueOf(response.raw()));
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -187,6 +187,8 @@ public class PhotosFragment extends Fragment {
         }
         return super.onContextItemSelected(item);
     }
+
+
 
 
 }

@@ -35,7 +35,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             Images.deleteAll(Images.class);
             for (int i = 0; i < dates.size(); i++) {
 
-                Images model = new Images(dates.get(i).getId(), dates.get(i).getDate(), dates.get(i).getUrl());
+                Images model = new Images(
+                        dates.get(i).getDate(),
+                        dates.get(i).getUrl(),
+                        dates.get(i).getId(),
+                        dates.get(i).getLat(),
+                        dates.get(i).getLng());
 
                 model.save();
             }
@@ -80,9 +85,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         List<Images> dbModelList = Images.listAll(Images.class);
         Images model;
         for (int i = 0; i < dbModelList.size(); i++) {
-            if (dbModelList.get(i).photoId == id) {
+            if (dbModelList.get(i).getPhotoId() == id) {
                 model = Images.findById(Images.class, dbModelList.get(i).getId());
                 model.delete();
+            }
+        }
+
+        for (int i = 0; i < dates.size(); i++) {
+            if (dates.get(i).getId() == id) {
+                dates.remove(i);
             }
         }
         notifyDataSetChanged();
@@ -111,9 +122,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         List<Images> dbModelList = Images.listAll(Images.class);
 
 
-        final String url = dbModelList.get(position).url;
-        final int date = dbModelList.get(position).date;
-        final int id = dbModelList.get(position).photoId;
+        final String url = dbModelList.get(position).getUrl();
+        final int date = dbModelList.get(position).getDate();
+        final int id = dbModelList.get(position).getPhotoId();
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -132,8 +143,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         });
 
 
-        holder.textView.setText(String.valueOf(dbModelList.get(position).date));
-        Picasso.with(context).load(dbModelList.get(position).url).into(holder.imageView);
+        holder.textView.setText(String.valueOf(dbModelList.get(position).getDate()));
+        Picasso.with(context).load(dbModelList.get(position).getUrl()).into(holder.imageView);
     }
 
     @Override

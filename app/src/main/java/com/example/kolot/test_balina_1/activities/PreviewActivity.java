@@ -1,6 +1,5 @@
 package com.example.kolot.test_balina_1.activities;
 
-import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.kolot.test_balina_1.R;
-import com.example.kolot.test_balina_1.fragments.PhotosFragment;
 import com.example.kolot.test_balina_1.networking.api.Api;
 import com.example.kolot.test_balina_1.networking.dto.Comments.CommentsDto;
 import com.example.kolot.test_balina_1.networking.dto.Images.GetImageDto;
@@ -27,15 +25,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PreviewActivity extends AppCompatActivity implements View.OnClickListener{
+public class PreviewActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView previewImageView;
-    private Button previewCancel,previewUpload;
+    private Button previewCancel, previewUpload;
     private String token;
     private String encoded;
     private String pathBitmap;
     private Retrofit retrofit;
-    private int id= 0;
+    private double lat, lon;
+    private int id = 0;
     private String url = "";
     final String BASE_URL = "http://junior.balinasoft.com/api/";
 
@@ -49,6 +48,11 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             token = bundle.getString("token");
             encoded = bundle.getString("base64");
             pathBitmap = bundle.getString("pathBitmap");
+            lat = bundle.getDouble("lat");
+            lon = bundle.getDouble("lon");
+            Log.e("lat: ", String.valueOf(lat));
+            Log.e("ont: ", String.valueOf(lon));
+
         }
         previewImageView = (ImageView) findViewById(R.id.preview);
         previewCancel = (Button) findViewById(R.id.cancel);
@@ -58,7 +62,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         previewUpload.setOnClickListener(this);
         previewCancel.setOnClickListener(this);
 
-        retrofit= new Retrofit.Builder()
+        retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -67,31 +71,31 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(PreviewActivity.this, Main2Activity.class);
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.cancel:
-                startActivity(intent);
+                finish();
                 break;
 
             case R.id.upload:
-                uploadImage(encoded);
-                startActivity(intent);
+                uploadImage(encoded, lat,lon);
+                finish();
                 break;
         }
     }
 
 
-    public void uploadImage(String base64){
+    public void uploadImage(String base64, double lat, double lon) {
 
         Api api_image = retrofit.create(Api.class);
 
-        api_image.upload(new imagesDto(base64, Integer.parseInt(new SimpleDateFormat("yyyyMMdd").format(new Date())), 0, 0), token)
+        api_image.upload(new imagesDto(base64, Integer.parseInt(new SimpleDateFormat("yyyyMMdd").format(new Date())), (int) lat, (int) lon), token)
                 .enqueue(new Callback<postImageStatusDto>() {
                     @Override
                     public void onResponse(@NonNull Call<postImageStatusDto> call, @NonNull Response<postImageStatusDto> response) {
                         Log.e("responsePost", response.body().getData().getUrl());
                         Log.e("responsePost", String.valueOf(response.body().getData().getId()));
-                        PhotosFragment.i = 0 ;
+                        Log.e("responsePost", String.valueOf(response.body().getData().getLat()));
+                        Log.e("responsePost", String.valueOf(response.body().getData().getLng()));
                     }
 
                     @Override
@@ -101,7 +105,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 });
     }
 
-    public void getImages(){
+    public void getImages() {
         Api api_image = retrofit.create(Api.class);
         api_image.download(0, token)
                 .enqueue(new Callback<GetImageDto>() {
@@ -120,14 +124,14 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 });
     }
 
-    public void getComments(int imageId){
+    public void getComments(int imageId) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         Api api_comment = retrofit.create(Api.class);
 
-        api_comment.getComments(imageId, 0 , token)
+        api_comment.getComments(imageId, 0, token)
                 .enqueue(new Callback<CommentsDto>() {
                     @Override
                     public void onResponse(@NonNull Call<CommentsDto> call, @NonNull Response<CommentsDto> response) {
